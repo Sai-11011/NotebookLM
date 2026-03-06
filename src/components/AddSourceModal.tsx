@@ -95,17 +95,19 @@ export function AddSourceModal({ isOpen, onClose, onAdd }: AddSourceModalProps) 
       <div className="w-full max-w-2xl mb-12">
         <div className="relative group">
           <div className="absolute inset-0 bg-blue-500/10 blur-2xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity" />
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-full opacity-0 group-focus-within:opacity-100 transition duration-500 blur-sm"></div>
+
           <form
             onSubmit={handleWebSubmit}
-            className="relative flex items-center bg-[#1a1a1e] border border-white/10 rounded-full p-2 h-16 shadow-2xl transition-all focus-within:border-blue-500/50"
+            className="relative flex items-center bg-[#1a1a1e]/90 backdrop-blur-xl border border-white/10 rounded-full p-2 h-16 shadow-2xl transition-all focus-within:border-blue-500/50"
           >
-            <Search className="w-6 h-6 text-white/40 ml-4 shrink-0" />
+            <Search className="w-6 h-6 text-white/40 ml-4 shrink-0 transition-colors group-focus-within:text-blue-400" />
             <input
               type="text"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Search the web for new sources"
-              className="flex-1 bg-transparent border-none focus:ring-0 text-white placeholder:text-white/20 px-4 text-lg"
+              className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-white placeholder:text-white/30 px-4 text-lg"
             />
             <div className="hidden md:flex items-center gap-1 shrink-0 px-2 border-l border-white/5 mr-2">
               <button type="button" onClick={() => alert('Web option coming soon!')} className="flex items-center gap-2 px-3 py-1.5 hover:bg-white/5 rounded-lg text-sm font-medium text-white/60 transition-colors">
@@ -129,21 +131,24 @@ export function AddSourceModal({ isOpen, onClose, onAdd }: AddSourceModalProps) 
       {/* Drop Zone */}
       <div
         onClick={() => fileInputRef.current?.click()}
-        className="w-full max-w-2xl aspect-[16/6] border-2 border-dashed border-white/10 rounded-[32px] flex flex-col items-center justify-center group hover:border-blue-500/40 hover:bg-blue-500/5 transition-all cursor-pointer mb-12"
+        className="relative w-full max-w-2xl aspect-[16/6] border-2 border-dashed border-white/10 rounded-[32px] flex flex-col items-center justify-center group hover:border-blue-500/40 hover:bg-blue-500/5 transition-all cursor-pointer mb-12 overflow-hidden bg-white/[0.02] backdrop-blur-sm"
       >
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          className="hidden"
-          accept=".pdf"
-        />
-        <p className="text-2xl text-white/40 font-medium group-hover:text-white/60 mb-2 transition-colors">
-          or drop your files
-        </p>
-        <p className="text-sm text-white/20 group-hover:text-white/30 transition-colors">
-          pdf, images, docs, audio, <span className="underline">and more</span>
-        </p>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="relative z-10 flex flex-col items-center">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+            accept=".pdf"
+          />
+          <p className="text-2xl text-white/50 font-medium group-hover:text-white mb-2 transition-colors">
+            or drop your files
+          </p>
+          <p className="text-sm text-white/30 group-hover:text-white/50 transition-colors tracking-wide">
+            pdf, images, docs, audio, <span className="underline decoration-white/20 underline-offset-4">and more</span>
+          </p>
+        </div>
       </div>
 
       {/* Action Pills */}
@@ -245,13 +250,16 @@ export function AddSourceModal({ isOpen, onClose, onAdd }: AddSourceModalProps) 
             {view === 'web' && (
               <div className="w-full max-w-xl mx-auto space-y-6 text-center">
                 <h3 className="text-xl font-semibold">Add Website or YouTube URL</h3>
-                <input
-                  type="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white outline-none focus:ring-2 focus:ring-blue-500/50"
-                />
+                <div className="relative group text-left">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-2xl opacity-0 group-focus-within:opacity-100 transition duration-500 blur-sm"></div>
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://..."
+                    className="relative w-full bg-[#16161a] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-blue-500/50 shadow-inner"
+                  />
+                </div>
                 <div className="flex justify-center gap-4">
                   <button onClick={() => setView('main')} className="px-6 py-2 rounded-full hover:bg-white/5 transition-colors">Cancel</button>
                   <button

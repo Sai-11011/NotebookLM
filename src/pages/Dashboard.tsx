@@ -57,10 +57,12 @@ export default function Dashboard() {
       <div className="max-w-6xl mx-auto">
         <header className="flex justify-between items-center mb-12">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]">
               <Book className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">NotebookLM Clone</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/50 animate-gradient-x">
+              NotebookLM Clone
+            </h1>
           </div>
           <div className="flex items-center gap-4">
             <div className="w-8 h-8 rounded-full bg-white/10 border-2 border-white/10 shadow-sm overflow-hidden">
@@ -75,12 +77,12 @@ export default function Dashboard() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleCreateNotebook}
-            className="h-64 rounded-[32px] border border-dashed border-white/20 flex flex-col items-center justify-center gap-4 text-white/50 hover:border-indigo-500/50 hover:text-indigo-400 hover:bg-indigo-500/5 transition-all group bg-white/5"
+            className="h-64 rounded-[32px] border border-dashed border-white/20 flex flex-col items-center justify-center gap-4 text-white/50 hover:border-indigo-500/50 hover:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all group bg-white/5 backdrop-blur-sm"
           >
-            <div className="w-16 h-16 rounded-full bg-white/5 group-hover:bg-indigo-500/20 flex items-center justify-center transition-colors">
-              <Plus className="w-8 h-8" />
+            <div className="w-16 h-16 rounded-full bg-white/5 group-hover:bg-indigo-500/20 flex items-center justify-center transition-colors shadow-inner">
+              <Plus className="w-8 h-8 opacity-70 group-hover:opacity-100 transition-opacity" />
             </div>
-            <span className="font-medium text-lg">New Notebook</span>
+            <span className="font-medium text-lg tracking-wide">New Notebook</span>
           </motion.button>
 
           {/* Notebook Cards */}
@@ -92,15 +94,20 @@ export default function Dashboard() {
             notebooks.map((notebook) => (
               <motion.div
                 key={notebook.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                whileHover={{ y: -4 }}
-                className="h-64 bg-[#1a1a2e] rounded-[32px] p-6 shadow-2xl hover:shadow-indigo-500/10 transition-all border border-white/10 flex flex-col justify-between group cursor-pointer relative overflow-visible"
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                whileHover={{ y: -6, scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                className="h-64 bg-white/5 backdrop-blur-xl rounded-[32px] p-6 shadow-xl hover:shadow-[0_20px_40px_-15px_rgba(99,102,241,0.2)] transition-all duration-300 border border-white/5 hover:border-white/20 flex flex-col justify-between group cursor-pointer relative overflow-hidden"
                 onClick={() => navigate(`/notebook/${notebook.id}`)}
               >
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity rounded-t-2xl" />
+                {/* Stunning Hover Gradient Top Bar */}
+                <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 opacity-0 group-hover:opacity-100 transition-all duration-500 transform -translate-y-full group-hover:translate-y-0" />
 
-                <div>
+                {/* Subtle Glow Background on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                <div className="relative z-10">
                   <div className="flex justify-between items-start mb-4">
                     <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
                       <Book className="w-5 h-5" />

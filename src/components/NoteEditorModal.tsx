@@ -42,23 +42,25 @@ export function NoteEditorModal({ isOpen, onClose, onSave, initialNote }: NoteEd
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={initialNote ? "Edit Note" : "New Note"} variant="premium">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
+        <div className="relative group">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition duration-500 blur-sm"></div>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Note Title"
-            className="w-full px-4 py-2 text-lg font-semibold bg-white/5 text-white border-none rounded-lg focus:ring-0 focus:bg-white/10 placeholder:text-white/40 transition-colors"
+            className="relative w-full px-5 py-3 text-lg font-semibold bg-[#16161a] text-white border border-white/10 rounded-xl focus:border-indigo-500/50 focus:outline-none transition-all shadow-inner placeholder:text-white/30"
             required
           />
         </div>
 
-        <div>
+        <div className="relative group mt-4">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition duration-500 blur-sm"></div>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Start typing your note..."
-            className="w-full px-4 py-2 min-h-[200px] border-none rounded-lg focus:ring-0 resize-none bg-white/5 text-white/90 placeholder:text-white/40 focus:bg-white/10 leading-relaxed transition-colors"
+            className="relative w-full px-5 py-4 min-h-[240px] border border-white/10 rounded-xl focus:outline-none focus:border-indigo-500/50 resize-none bg-[#16161a] text-white/90 placeholder:text-white/30 leading-relaxed transition-all shadow-inner"
             required
           />
         </div>

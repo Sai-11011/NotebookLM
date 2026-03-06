@@ -56,9 +56,11 @@ export function SourcePanel({ isMobileOpen, onMobileClose }: SourcePanelProps) {
   };
 
   const Content = (
-    <div className="flex flex-col h-full bg-[#0a0a0c]">
-      <div className="p-4 border-b border-white/10 flex justify-between items-center bg-[#0a0a0c]">
-        <h2 className="font-semibold text-white/80">Sources</h2>
+    <div className="flex flex-col h-full bg-[#0a0a0c]/80 backdrop-blur-xl border-r border-white/5 relative z-10">
+      <div className="p-5 flex justify-between items-center relative z-20">
+        <h2 className="font-semibold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60">
+          Sources
+        </h2>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsAddModalOpen(true)}
@@ -77,57 +79,70 @@ export function SourcePanel({ isMobileOpen, onMobileClose }: SourcePanelProps) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 space-y-2">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 relative z-10">
         {notebook.sources.length === 0 ? (
-          <div className="text-center p-4 text-white/40 text-sm">
-            No sources added yet. Upload a PDF or add a link to get started.
+          <div className="text-center p-6 text-white/30 text-sm border border-dashed border-white/10 rounded-2xl mx-2 mt-4 bg-white/[0.02]">
+            No sources yet. Click '+' to start building your knowledge base.
           </div>
         ) : (
-          notebook.sources.map((source) => {
-            const isSelected = selectedSourceIds.includes(source.id);
-            return (
-              <motion.div
-                key={source.id}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                onClick={() => toggleSourceSelection(source.id)}
-                className={cn(
-                  "group flex items-center gap-3 p-3 rounded-lg border shadow-sm hover:shadow-md transition-all cursor-pointer select-none relative",
-                  isSelected
-                    ? "bg-indigo-500/20 border-indigo-500/30 ring-1 ring-indigo-500/30"
-                    : "bg-white/5 border-white/10"
-                )}
-              >
-                <div className="shrink-0">
-                  <div className={cn(
-                    "w-4 h-4 rounded border flex items-center justify-center transition-colors",
-                    isSelected ? "bg-indigo-500 border-indigo-500" : "border-white/20 bg-transparent"
-                  )}>
-                    {isSelected && <div className="w-2 h-2 bg-white rounded-sm" />}
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={cn("text-sm font-medium truncate", isSelected ? "text-indigo-300" : "text-white/80")}>
-                    {source.name}
-                  </p>
-                  <div className="flex items-center gap-1.5">
-                    {getIcon(source.type)}
-                    <p className="text-xs text-white/40 truncate">{source.type.toUpperCase()}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={(e) => handleDeleteSource(e, source.id)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-500/10 text-red-400 rounded transition-all"
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.05 } }
+            }}
+            className="space-y-3"
+          >
+            {notebook.sources.map((source) => {
+              const isSelected = selectedSourceIds.includes(source.id);
+              return (
+                <motion.div
+                  key={source.id}
+                  variants={{
+                    hidden: { opacity: 0, x: -20 },
+                    visible: { opacity: 1, x: 0 }
+                  }}
+                  whileHover={{ scale: 1.02, x: 2 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => toggleSourceSelection(source.id)}
+                  className={cn(
+                    "group flex items-center gap-3 p-3.5 rounded-xl transition-all cursor-pointer select-none relative overflow-hidden",
+                    isSelected
+                      ? "bg-indigo-500/15 border border-indigo-500/30 shadow-[0_4px_20px_-5px_rgba(99,102,241,0.2)]"
+                      : "bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] hover:border-white/10"
+                  )}
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </motion.div>
-            );
-          })
+                  <div className="shrink-0 relative z-10">
+                    <div className={cn(
+                      "w-4 h-4 rounded border flex items-center justify-center transition-all duration-300",
+                      isSelected ? "bg-indigo-500 border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" : "border-white/20 bg-transparent group-hover:border-white/40"
+                    )}>
+                      {isSelected && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-2 h-2 bg-white rounded-sm" />}
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0 relative z-10">
+                    <p className={cn("text-[13px] font-medium truncate transition-colors", isSelected ? "text-indigo-200" : "text-white/80 group-hover:text-white")}>
+                      {source.name}
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      {getIcon(source.type)}
+                      <p className="text-[10px] font-medium tracking-wider text-white/30 truncate">{source.type.toUpperCase()}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => handleDeleteSource(e, source.id)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-2 hover:bg-red-500/15 text-red-400/70 hover:text-red-400 rounded-lg transition-all z-20 backdrop-blur-md"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </motion.div>
+              );
+            })}
+          </motion.div>
         )}
       </div>
 
-      <div className="p-4 border-t border-white/10 bg-[#0a0a0c]">
+      <div className="p-4 border-t border-white/5 bg-transparent relative z-20">
         <div className="text-xs text-white/40 text-center">
           {selectedSourceIds.length} of {notebook.sources.length} selected
         </div>
