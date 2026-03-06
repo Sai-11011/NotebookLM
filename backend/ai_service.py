@@ -67,7 +67,7 @@ def chat_with_sources(notebook_id: str, user_message: str, chat_history: list[di
     # Step 3: Generate a response using the agentic loop (automatic function calling)
     try:
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             contents=contents,
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
