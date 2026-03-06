@@ -1,10 +1,13 @@
 """
 Vector Store using ChromaDB for RAG (Retrieval-Augmented Generation).
 Manages storing and retrieving document chunks by notebook.
+Uses Gemini text-embedding-004 for high-quality embeddings.
 """
 import os
+import time
 import chromadb
 from chromadb.config import Settings
+from chromadb.api.types import EmbeddingFunction, Documents, Embeddings
 
 
 # Support persistent storage on Render/Docker via DATA_DIR
@@ -14,6 +17,56 @@ if not os.path.isabs(DATA_DIR):
     DATA_DIR = os.path.join(os.path.dirname(__file__), DATA_DIR)
 
 CHROMA_DB_PATH = os.path.join(DATA_DIR, "chroma_db")
+
+EMBEDDING_MODEL = "gemini-embedding-001"
+EMBEDDING_BATCH_SIZE = 100  # Max documents per embedding API call
+EMBEDDING_RPM_LIMIT = 100   # Rate limit for embedding model
+
+
+class GeminiEmbeddingFunction(EmbeddingFunction):
+    """Custom ChromaDB embedding function using Google Gemini text-embedding-004."""
+
+    def __init__(self):
+        from google import genai
+        api_key = os.environ.get("GOOGLE_API_KEY")
+        if not api_key:
+            raise RuntimeError("GOOGLE_API_KEY is not set in environment/.env")
+        self._client = genai.Client(api_key=api_key)
+
+    def __call__(self, input: Documents) -> Embeddings:
+        """Embed documents in batches to respect rate limits."""
+        all_embeddings = []
+        for i in range(0, len(input), EMBEDDING_BATCH_SIZE):
+            batch = input[i : i + EMBEDDING_BATCH_SIZE]
+            try:
+                result = self._client.models.embed_content(
+                    model=EMBEDDING_MODEL,
+                    contents=batch,
+                )
+                all_embeddings.extend([e.values for e in result.embeddings])
+            except Exception as e:
+                # If rate limited, wait and retry once
+                if "429" in str(e):
+                    time.sleep(2)
+                    result = self._client.models.embed_content(
+                        model=EMBEDDING_MODEL,
+                        contents=batch,
+                    )
+                    all_embeddings.extend([e.values for e in result.embeddings])
+                else:
+                    raise
+        return all_embeddings
+
+
+# Singleton embedding function instance (lazy-loaded)
+_embedding_fn = None
+
+def _get_embedding_fn():
+    """Return a cached GeminiEmbeddingFunction instance."""
+    global _embedding_fn
+    if _embedding_fn is None:
+        _embedding_fn = GeminiEmbeddingFunction()
+    return _embedding_fn
 
 
 def _get_client():
@@ -25,13 +78,14 @@ def _get_client():
 
 
 def _get_collection(notebook_id: str):
-    """Get (or create) a ChromaDB collection per notebook."""
+    """Get (or create) a ChromaDB collection per notebook using Gemini embeddings."""
     client = _get_client()
     # Collection names must be 3-63 chars and alphanumeric with hyphens
     collection_name = f"nb-{notebook_id[:40]}"
     return client.get_or_create_collection(
         name=collection_name,
         metadata={"hnsw:space": "cosine"},
+        embedding_function=_get_embedding_fn(),
     )
 
 
