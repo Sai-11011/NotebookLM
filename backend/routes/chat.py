@@ -37,11 +37,13 @@ def send_message(notebook_id):
         history_rows = (
             db.query(Message)
             .filter(Message.notebook_id == notebook_id, Message.id != user_msg.id)
-            .order_by(Message.timestamp.asc())
+            .order_by(Message.timestamp.desc())
             .limit(20)  # Prevent unbounded context causing API timeouts
             .all()
         )
-        history = [{"role": m.role, "content": m.content} for m in history_rows if m.content.strip()]
+        # Reverse to chronological order
+        history_rows.reverse()
+        history = [{"role": m.role, "content": m.content} for m in history_rows if m.content and m.content.strip()]
 
         # Call AI service
         try:

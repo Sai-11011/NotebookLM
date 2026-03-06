@@ -43,16 +43,26 @@ def chat_with_sources(notebook_id: str, user_message: str, chat_history: list[di
     )
 
     # Step 2: Convert history to the format expected by google-genai
-    # Only include valid roles (user/model) and non-empty content
+    # Gemini requires alternating roles. We combine sequential messages of the same role.
     contents = []
+    
     for msg in chat_history:
         role = "user" if msg.get("role") == "user" else "model"
         content = msg.get("content", "").strip()
-        if content:  # Skip empty messages to avoid API errors
+        if not content:
+            continue
+            
+        if contents and contents[-1].role == role:
+            # Append string to existing part instead of string concatenation to preserve structure
+            contents[-1].parts.append(types.Part(text="\n\n" + content))
+        else:
             contents.append(types.Content(role=role, parts=[types.Part(text=content)]))
 
     # Append the current user message
-    contents.append(types.Content(role="user", parts=[types.Part(text=user_message)]))
+    if contents and contents[-1].role == "user":
+        contents[-1].parts.append(types.Part(text="\n\n" + user_message))
+    else:
+        contents.append(types.Content(role="user", parts=[types.Part(text=user_message)]))
 
     # Step 3: Generate a response using the agentic loop (automatic function calling)
     try:
