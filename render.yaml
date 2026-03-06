@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: notebooklm-agentic
+    runtime: docker
+    env: python
+    plan: free # Change to starter or higher if you need more resources
+    region: ohio # Choose the region closest to you
+    envVars:
+      - key: GOOGLE_API_KEY
+        sync: false # Set this in the Render dashboard manually
+      - key: FLASK_ENV
+        value: production
+      - key: DATA_DIR
+        value: /data
+    disk:
+      name: notebook-data
+      mountPath: /data
+      sizeGB: 1 # Standard persistent disk size for SQLite/ChromaDB
+    autoDeploy: true

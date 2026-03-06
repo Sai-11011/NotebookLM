@@ -1,0 +1,152 @@
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { notebookService } from '@/services/mockApi';
+import { Notebook } from '@/types';
+import { Plus, Book, Clock, MoreHorizontal, Trash2, Edit2 } from 'lucide-react';
+import { motion } from 'motion/react';
+
+export default function Dashboard() {
+  const [notebooks, setNotebooks] = useState<Notebook[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadNotebooks = async () => {
+      const data = await notebookService.getNotebooks();
+      setNotebooks(data);
+      setLoading(false);
+    };
+    loadNotebooks();
+  }, []);
+
+  const handleCreateNotebook = async () => {
+    const title = prompt("Enter notebook title:");
+    if (title) {
+      const newNotebook = await notebookService.createNotebook(title);
+      setNotebooks([newNotebook, ...notebooks]);
+      navigate(`/notebook/${newNotebook.id}`);
+    }
+  };
+
+  const handleDeleteNotebook = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (confirm("Are you sure you want to delete this notebook?")) {
+      await notebookService.deleteNotebook(id);
+      setNotebooks(notebooks.filter(n => n.id !== id));
+    }
+    setActiveMenuId(null);
+  };
+
+  const handleRenameNotebook = async (e: React.MouseEvent, id: string, currentTitle: string) => {
+    e.stopPropagation();
+    const newTitle = prompt("Enter new title:", currentTitle);
+    if (newTitle && newTitle !== currentTitle) {
+      try {
+        const updated = await notebookService.renameNotebook(id, newTitle);
+        setNotebooks(notebooks.map(n => n.id === id ? updated : n));
+      } catch (err) {
+        alert('Failed to rename notebook');
+      }
+    }
+    setActiveMenuId(null);
+  };
+
+  return (
+    <div className="min-h-screen bg-premium p-8" onClick={() => setActiveMenuId(null)}>
+      <div className="max-w-6xl mx-auto">
+        <header className="flex justify-between items-center mb-12">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <Book className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">NotebookLM Clone</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-8 h-8 rounded-full bg-white/10 border-2 border-white/10 shadow-sm overflow-hidden">
+              <img src="https://picsum.photos/seed/user/100/100" alt="User" />
+            </div>
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Create New Card */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleCreateNotebook}
+            className="h-64 rounded-[32px] border border-dashed border-white/20 flex flex-col items-center justify-center gap-4 text-white/50 hover:border-indigo-500/50 hover:text-indigo-400 hover:bg-indigo-500/5 transition-all group bg-white/5"
+          >
+            <div className="w-16 h-16 rounded-full bg-white/5 group-hover:bg-indigo-500/20 flex items-center justify-center transition-colors">
+              <Plus className="w-8 h-8" />
+            </div>
+            <span className="font-medium text-lg">New Notebook</span>
+          </motion.button>
+
+          {/* Notebook Cards */}
+          {loading ? (
+            [1, 2].map((i) => (
+              <div key={i} className="h-64 rounded-[32px] bg-white/5 animate-pulse border border-white/5" />
+            ))
+          ) : (
+            notebooks.map((notebook) => (
+              <motion.div
+                key={notebook.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ y: -4 }}
+                className="h-64 bg-[#1a1a2e] rounded-[32px] p-6 shadow-2xl hover:shadow-indigo-500/10 transition-all border border-white/10 flex flex-col justify-between group cursor-pointer relative overflow-visible"
+                onClick={() => navigate(`/notebook/${notebook.id}`)}
+              >
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity rounded-t-2xl" />
+
+                <div>
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                      <Book className="w-5 h-5" />
+                    </div>
+                    <div className="relative">
+                      <button
+                        className="p-1 hover:bg-white/10 rounded-full text-white/40 hover:text-white transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveMenuId(activeMenuId === notebook.id ? null : notebook.id);
+                        }}
+                      >
+                        <MoreHorizontal className="w-5 h-5" />
+                      </button>
+
+                      {activeMenuId === notebook.id && (
+                        <div className="absolute right-0 top-8 w-40 bg-[#0a0a0c] rounded-xl shadow-2xl border border-white/10 py-1 z-20">
+                          <button
+                            onClick={(e) => handleRenameNotebook(e, notebook.id, notebook.title)}
+                            className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white flex items-center gap-2 transition-colors"
+                          >
+                            <Edit2 className="w-4 h-4" /> Rename
+                          </button>
+                          <button
+                            onClick={(e) => handleDeleteNotebook(e, notebook.id)}
+                            className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" /> Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">{notebook.title}</h3>
+                  <p className="text-sm text-white/40">{notebook.sources.length} sources</p>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs text-white/30">
+                  <Clock className="w-3 h-3" />
+                  <span>Edited {new Date(notebook.lastModified).toLocaleDateString()}</span>
+                </div>
+              </motion.div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

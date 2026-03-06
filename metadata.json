@@ -1,0 +1,5 @@
+{
+  "name": "NotebookLM Clone",
+  "description": "A frontend clone of NotebookLM with source management, chat interface, and note-taking capabilities, designed to connect to a Flask backend.",
+  "requestFramePermissions": []
+}
