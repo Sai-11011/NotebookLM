@@ -5,6 +5,8 @@ import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { notebookService } from '@/services/mockApi';
+import { ConfirmationModal } from './ConfirmationModal';
+import { RateLimitPopup } from './RateLimitPopup';
 
 export function ChatPanel() {
   const { notebook, setNotebook, refreshNotebook, selectedSourceIds, toggleSourceSelection } = useNotebook();
@@ -12,6 +14,10 @@ export function ChatPanel() {
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Modal states
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
+  const [isRateLimitOpen, setIsRateLimitOpen] = useState(false);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -46,8 +52,15 @@ export function ChatPanel() {
       // Refresh notebook to get accurate saved state from backend
       await refreshNotebook();
     } catch (err: unknown) {
-      const errMsg = err instanceof Error ? err.message : 'Unknown error';
-      setError(`Failed to get a response: ${errMsg}`);
+      const errMsg = err instanceof Error ? err.message : String(err);
+
+      // If it's a 429 rate limit error, show the beautiful popup
+      if (errMsg.includes('429') || errMsg.toLowerCase().includes('rate limit') || errMsg.includes('RESOURCE_EXHAUSTED')) {
+        setIsRateLimitOpen(true);
+      } else {
+        setError(`Failed to get a response: ${errMsg}`);
+      }
+
       // Revert optimistic update on error
       setNotebook(notebook);
     } finally {
@@ -56,7 +69,7 @@ export function ChatPanel() {
   };
 
   const handleClearChat = async () => {
-    if (!notebook || !confirm('Are you sure you want to clear the chat history?')) return;
+    if (!notebook) return;
     try {
       await notebookService.clearChat(notebook.id);
       setNotebook({ ...notebook, messages: [] });
@@ -81,7 +94,7 @@ export function ChatPanel() {
       <div className="absolute top-4 right-4 z-10">
         {notebook.messages.length > 0 && (
           <button
-            onClick={handleClearChat}
+            onClick={() => setIsClearModalOpen(true)}
             className="p-2 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-full transition-colors"
             title="Clear chat"
           >
@@ -242,6 +255,21 @@ export function ChatPanel() {
           </p>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={isClearModalOpen}
+        onClose={() => setIsClearModalOpen(false)}
+        onConfirm={handleClearChat}
+        title="Clear Chat History"
+        message="Are you sure you want to clear this entire conversation? The AI will lose context of previous messages."
+        confirmLabel="Clear History"
+        variant="danger"
+      />
+
+      <RateLimitPopup
+        isOpen={isRateLimitOpen}
+        onClose={() => setIsRateLimitOpen(false)}
+      />
     </div>
   );
 }

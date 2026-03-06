@@ -49,8 +49,12 @@ def send_message(notebook_id):
         try:
             result = chat_with_sources(notebook_id, user_content, history)
         except RuntimeError as e:
-            # If API key not set or Gemini error, return friendly error
-            return jsonify({"error": str(e)}), 503
+            error_msg = str(e)
+            # Distinguish rate limit from other RuntimeErrors
+            if "RATE_LIMIT" in error_msg or "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
+                return jsonify({"error": "Rate limit reached. Please wait a moment and try again."}), 429
+            # API key not set or other Gemini error
+            return jsonify({"error": error_msg}), 503
 
         # Save model response
         model_msg = Message(

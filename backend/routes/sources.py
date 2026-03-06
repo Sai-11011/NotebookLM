@@ -2,9 +2,10 @@
 Source routes.
 Handles: add source (PDF upload, URL, YouTube), delete source.
 """
+from datetime import datetime, timezone
 import uuid
 from flask import Blueprint, jsonify, request
-from models import SessionLocal, Notebook, Source
+from models import SessionLocal, Notebook, Source, utcnow
 from vector_store import add_source_to_store, delete_source_from_store
 from processors.pdf_processor import extract_pdf_text
 from processors.web_processor import extract_url_text
@@ -91,15 +92,28 @@ def add_source(notebook_id):
         )
         db.add(source)
         # Touch notebook last_modified so dashboard card updates
-        notebook.last_modified = datetime.now(timezone.utc)
+        notebook.last_modified = utcnow()
         db.commit()
         db.refresh(source)
 
-        # Index in vector store
+        # Index in vector store (may fail due to rate limits but source is saved)
+        embedding_warning = None
         if extracted_text:
-            add_source_to_store(notebook_id, source.id, name, extracted_text)
+            try:
+                add_source_to_store(notebook_id, source.id, name, extracted_text)
+            except Exception as embed_err:
+                err_str = str(embed_err)
+                if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                    embedding_warning = "Source saved but embedding failed due to rate limits. The AI may not find this source in searches until re-indexed."
+                    print(f"  ⚠ Embedding rate-limited for source '{name}': {embed_err}")
+                else:
+                    embedding_warning = f"Source saved but indexing failed: {err_str}"
+                    print(f"  ✖ Embedding failed for source '{name}': {embed_err}")
 
-        return jsonify(source.to_dict()), 201
+        response = source.to_dict()
+        if embedding_warning:
+            response["warning"] = embedding_warning
+        return jsonify(response), 201
 
     finally:
         db.close()

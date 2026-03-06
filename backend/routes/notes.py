@@ -4,7 +4,7 @@ Handles: create, update, delete notes within a notebook.
 """
 import uuid
 from flask import Blueprint, jsonify, request
-from models import SessionLocal, Notebook, Note
+from models import SessionLocal, Notebook, Note, utcnow
 
 bp = Blueprint("notes", __name__)
 
@@ -23,9 +23,11 @@ def create_note(notebook_id):
             notebook_id=notebook_id,
             title=data.get("title", ""),
             content=data.get("content", ""),
-            color=data.get("color", "bg-yellow-50"),
+            color=data.get("color", "bg-white/5"),
         )
         db.add(note)
+        # Update notebook last_modified
+        notebook.last_modified = utcnow()
         db.commit()
         db.refresh(note)
         return jsonify(note.to_dict()), 201
@@ -50,6 +52,8 @@ def update_note(notebook_id, note_id):
             note.content = data["content"]
         if "color" in data:
             note.color = data["color"]
+        # Update notebook last_modified
+        note.notebook.last_modified = utcnow()
         db.commit()
         db.refresh(note)
         return jsonify(note.to_dict())

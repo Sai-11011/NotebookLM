@@ -27,5 +27,18 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    build: {
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            ven_react: ['react', 'react-dom', 'react-router-dom'],
+            ven_icons: ['lucide-react'],
+            ven_motion: ['motion/react'],
+            ven_markdown: ['react-markdown'],
+          },
+        },
+      },
+    },
   };
 });

@@ -4,6 +4,7 @@ import { FileText, Link as LinkIcon, Youtube, File, Plus, Trash2, X } from 'luci
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { AddSourceModal } from './AddSourceModal';
+import { ConfirmationModal } from './ConfirmationModal';
 import { notebookService } from '@/services/mockApi';
 
 interface SourcePanelProps {
@@ -12,8 +13,9 @@ interface SourcePanelProps {
 }
 
 export function SourcePanel({ isMobileOpen, onMobileClose }: SourcePanelProps) {
-  const { notebook, setNotebook, selectedSourceIds, toggleSourceSelection } = useNotebook();
+  const { notebook, setNotebook, selectedSourceIds, toggleSourceSelection, refreshNotebook } = useNotebook();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [deleteModalState, setDeleteModalState] = useState<{ isOpen: boolean; id: string }>({ isOpen: false, id: '' });
 
   if (!notebook) return null;
 
@@ -24,25 +26,33 @@ export function SourcePanel({ isMobileOpen, onMobileClose }: SourcePanelProps) {
         ...notebook,
         sources: [...notebook.sources, newSource],
       });
+      // Fetch the full notebook to ensure the server state is completely synced
+      await refreshNotebook();
     } catch (error) {
       console.error('Failed to add source:', error);
       throw error; // Re-throw so AddSourceModal can display the error
     }
   };
 
-  const handleDeleteSource = async (e: React.MouseEvent, sourceId: string) => {
-    e.stopPropagation();
-    if (!confirm('Are you sure you want to remove this source?')) return;
+  const confirmDeleteSource = async () => {
+    if (!deleteModalState.id) return;
 
     try {
-      await notebookService.deleteSource(notebook.id, sourceId);
+      await notebookService.deleteSource(notebook.id, deleteModalState.id);
       setNotebook({
         ...notebook,
-        sources: notebook.sources.filter(s => s.id !== sourceId),
+        sources: notebook.sources.filter(s => s.id !== deleteModalState.id),
       });
+      // Also remove from selectedSourceIds if it was selected
+      if (selectedSourceIds.includes(deleteModalState.id)) {
+        toggleSourceSelection(deleteModalState.id);
+      }
+      await refreshNotebook();
     } catch (error) {
       console.error('Failed to delete source:', error);
       alert('Failed to delete source');
+    } finally {
+      setDeleteModalState({ isOpen: false, id: '' });
     }
   };
 
@@ -130,7 +140,10 @@ export function SourcePanel({ isMobileOpen, onMobileClose }: SourcePanelProps) {
                     </div>
                   </div>
                   <button
-                    onClick={(e) => handleDeleteSource(e, source.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteModalState({ isOpen: true, id: source.id });
+                    }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-2 hover:bg-red-500/15 text-red-400/70 hover:text-red-400 rounded-lg transition-all z-20 backdrop-blur-md"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -185,6 +198,16 @@ export function SourcePanel({ isMobileOpen, onMobileClose }: SourcePanelProps) {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAdd={handleAddSource}
+      />
+
+      <ConfirmationModal
+        isOpen={deleteModalState.isOpen}
+        onClose={() => setDeleteModalState({ isOpen: false, id: '' })}
+        onConfirm={confirmDeleteSource}
+        title="Remove Source"
+        message="Are you sure you want to remove this source from your notebook? The AI will lose access to this information."
+        confirmLabel="Remove"
+        variant="danger"
       />
     </>
   );

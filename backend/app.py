@@ -21,6 +21,7 @@ from routes.notebooks import bp as notebooks_bp
 from routes.sources import bp as sources_bp
 from routes.notes import bp as notes_bp
 from routes.chat import bp as chat_bp
+from routes.search import bp as search_bp
 
 # ── App & Static File Setup ──────────────────────────────────────────────────
 # Support both local dev and Docker production paths
@@ -54,6 +55,7 @@ app.register_blueprint(notebooks_bp)
 app.register_blueprint(sources_bp)
 app.register_blueprint(notes_bp)
 app.register_blueprint(chat_bp)
+app.register_blueprint(search_bp)
 
 
 # ── Health check ─────────────────────────────────────────────────────────────
@@ -79,6 +81,19 @@ def serve_spa(path):
     return jsonify({
         "message": "React frontend not built yet. Run: npm run build"
     }), 200
+
+
+# ── SPA Fallback for 404s ────────────────────────────────────────────────────
+@app.errorhandler(404)
+def not_found(e):
+    """If the 404 is for a non-API route, serve index.html so React Router
+    can handle the route on the client side."""
+    from flask import request
+    if not request.path.startswith('/api/'):
+        index = os.path.join(DIST_DIR, "index.html")
+        if os.path.exists(index):
+            return send_file(index)
+    return jsonify({"error": "Not found"}), 404
 
 
 # ── Startup ───────────────────────────────────────────────────────────────────

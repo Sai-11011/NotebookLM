@@ -11,7 +11,8 @@ import {
   ArrowRight,
   Triangle,
   ClipboardList,
-  Plus
+  Plus,
+  Globe
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
@@ -22,11 +23,20 @@ interface AddSourceModalProps {
   onAdd: (source: { type: string; name?: string; url?: string; file?: File; content?: string }) => Promise<void>;
 }
 
-type ViewType = 'main' | 'web' | 'file' | 'text' | 'drive';
+type ViewType = 'main' | 'web' | 'file' | 'text' | 'drive' | 'search';
+
+interface SearchResult {
+  title: string;
+  url: string;
+  snippet: string;
+}
 
 export function AddSourceModal({ isOpen, onClose, onAdd }: AddSourceModalProps) {
   const [view, setView] = useState<ViewType>('main');
   const [url, setUrl] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [textContent, setTextContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +45,8 @@ export function AddSourceModal({ isOpen, onClose, onAdd }: AddSourceModalProps) 
   const resetState = () => {
     setView('main');
     setUrl('');
+    setSearchQuery('');
+    setSearchResults([]);
     setTextContent('');
     setError(null);
     setLoading(false);
@@ -76,6 +88,35 @@ export function AddSourceModal({ isOpen, onClose, onAdd }: AddSourceModalProps) 
     }
   };
 
+  const handleSearchSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    setView('search');
+    setIsSearching(true);
+    setError(null);
+    setSearchResults([]);
+
+    try {
+      const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setSearchResults(data.results || []);
+        if ((data.results || []).length === 0) {
+          setError('No results found. Try a different search query.');
+        }
+      } else {
+        setError(data.error || 'Search failed. Please try again.');
+      }
+    } catch (err) {
+      console.error('Search failed', err);
+      setError('Could not connect to the search service. Please check if the backend is running.');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const handleTextSubmit = async () => {
     if (!textContent) return;
     setError(null);
@@ -98,14 +139,14 @@ export function AddSourceModal({ isOpen, onClose, onAdd }: AddSourceModalProps) 
           <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-full opacity-0 group-focus-within:opacity-100 transition duration-500 blur-sm"></div>
 
           <form
-            onSubmit={handleWebSubmit}
+            onSubmit={handleSearchSubmit}
             className="relative flex items-center bg-[#1a1a1e]/90 backdrop-blur-xl border border-white/10 rounded-full p-2 h-16 shadow-2xl transition-all focus-within:border-blue-500/50"
           >
             <Search className="w-6 h-6 text-white/40 ml-4 shrink-0 transition-colors group-focus-within:text-blue-400" />
             <input
               type="text"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search the web for new sources"
               className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-white placeholder:text-white/30 px-4 text-lg"
             />
@@ -119,7 +160,7 @@ export function AddSourceModal({ isOpen, onClose, onAdd }: AddSourceModalProps) 
             </div>
             <button
               type="submit"
-              disabled={!url || loading}
+              disabled={!searchQuery.trim() || isSearching}
               className="w-10 h-10 bg-white/5 hover:bg-white/10 disabled:opacity-30 rounded-full flex items-center justify-center transition-all mr-1"
             >
               <ArrowRight className="w-5 h-5 text-white/60" />
@@ -220,6 +261,86 @@ export function AddSourceModal({ isOpen, onClose, onAdd }: AddSourceModalProps) 
     </div>
   );
 
+  const renderSearchView = () => (
+    <div className="w-full max-w-4xl mx-auto flex flex-col h-[70vh]">
+      <div className="flex items-center gap-4 mb-6 shrink-0">
+        <button onClick={() => setView('main')} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+          <ArrowRight className="w-5 h-5 rotate-180" />
+        </button>
+        <form onSubmit={handleSearchSubmit} className="flex-1 relative group">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition duration-500 blur-sm"></div>
+          <div className="relative flex items-center bg-[#16161a] border border-white/10 rounded-xl px-4 py-3">
+            <Search className="w-5 h-5 text-white/40 mr-3" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none text-white placeholder:text-white/30"
+            />
+          </div>
+        </form>
+      </div>
+
+      <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+        {isSearching ? (
+          <div className="h-full flex flex-col items-center justify-center text-white/40 space-y-4">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+            <p className="animate-pulse">Searching the web...</p>
+          </div>
+        ) : searchResults.length === 0 ? (
+          <div className="h-full flex flex-col items-center justify-center text-white/40">
+            <Globe className="w-12 h-12 mb-4 opacity-50" />
+            <p>No results found. Try a different query.</p>
+          </div>
+        ) : (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.05 } }
+            }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            {searchResults.map((result, idx) => (
+              <motion.div
+                key={idx}
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  visible: { opacity: 1, y: 0 }
+                }}
+                className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-blue-500/30 transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Globe className="w-4 h-4 text-blue-400 shrink-0" />
+                    <span className="text-xs font-mono text-white/40 truncate">{new URL(result.url).hostname}</span>
+                  </div>
+                  <h4 className="font-semibold text-blue-100 mb-2 line-clamp-2 leading-tight flex-1">
+                    {result.title}
+                  </h4>
+                  <p className="text-sm text-white/50 line-clamp-3 mb-4 leading-relaxed">
+                    {result.snippet}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setUrl(result.url);
+                    handleWebSubmit();
+                  }}
+                  disabled={loading}
+                  className="w-full py-2.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 font-medium rounded-xl transition-colors flex items-center justify-center gap-2 border border-blue-500/20"
+                >
+                  {loading && url === result.url ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                  Add as Source
+                </button>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <Modal
       isOpen={isOpen}
@@ -247,6 +368,7 @@ export function AddSourceModal({ isOpen, onClose, onAdd }: AddSourceModalProps) 
           >
             {view === 'main' && renderMainView()}
             {view === 'text' && renderTextView()}
+            {view === 'search' && renderSearchView()}
             {view === 'web' && (
               <div className="w-full max-w-xl mx-auto space-y-6 text-center">
                 <h3 className="text-xl font-semibold">Add Website or YouTube URL</h3>

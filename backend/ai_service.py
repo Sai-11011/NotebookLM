@@ -92,7 +92,20 @@ def chat_with_sources(notebook_id: str, user_message: str, chat_history: list[di
         # Re-raise RuntimeError (e.g., API key issues) so the caller gets HTTP 503
         raise
     except Exception as e:
-        # For unexpected Gemini API errors, return a user-friendly message
+        import traceback
+        print(f"\n{'='*60}")
+        print(f"  ✖ Gemini API Error in chat_with_sources:")
+        print(f"  Type: {type(e).__name__}")
+        print(f"  Message: {e}")
+        traceback.print_exc()
+        print(f"{'='*60}\n")
+        
+        # Propagate rate limit errors so the route can return HTTP 429
+        error_str = str(e)
+        if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+            raise RuntimeError("RATE_LIMIT_EXCEEDED") from e
+        
+        # For other unexpected Gemini API errors, return a user-friendly message
         error_type = type(e).__name__
         return {
             "content": f"I encountered an error ({error_type}) while processing your request. Please try again or check the server logs.",

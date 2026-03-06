@@ -34,27 +34,28 @@ class GeminiEmbeddingFunction(EmbeddingFunction):
         self._client = genai.Client(api_key=api_key)
 
     def __call__(self, input: Documents) -> Embeddings:
-        """Embed documents in batches to respect rate limits."""
+        """Embed documents in batches with exponential backoff for rate limits."""
         all_embeddings = []
         for i in range(0, len(input), EMBEDDING_BATCH_SIZE):
             batch = input[i : i + EMBEDDING_BATCH_SIZE]
-            try:
-                result = self._client.models.embed_content(
-                    model=EMBEDDING_MODEL,
-                    contents=batch,
-                )
-                all_embeddings.extend([e.values for e in result.embeddings])
-            except Exception as e:
-                # If rate limited, wait and retry once
-                if "429" in str(e):
-                    time.sleep(2)
+            max_retries = 5
+            for attempt in range(max_retries):
+                try:
                     result = self._client.models.embed_content(
                         model=EMBEDDING_MODEL,
                         contents=batch,
                     )
-                    all_embeddings.extend([e.values for e in result.embeddings])
-                else:
-                    raise
+                    all_embeddings.extend([emb.values for emb in result.embeddings])
+                    break  # Success, move to next batch
+                except Exception as exc:
+                    is_rate_limit = "429" in str(exc) or "RESOURCE_EXHAUSTED" in str(exc)
+                    if is_rate_limit and attempt < max_retries - 1:
+                        wait_time = (2 ** attempt) + 1  # 2s, 3s, 5s, 9s, 17s
+                        print(f"  ⚠ Embedding rate limit hit (attempt {attempt + 1}/{max_retries}). Waiting {wait_time}s...")
+                        time.sleep(wait_time)
+                    else:
+                        print(f"  ✖ Embedding failed: {exc}")
+                        raise
         return all_embeddings
 
 

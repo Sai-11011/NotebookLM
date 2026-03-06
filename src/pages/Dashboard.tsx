@@ -4,12 +4,19 @@ import { notebookService } from '@/services/mockApi';
 import { Notebook } from '@/types';
 import { Plus, Book, Clock, MoreHorizontal, Trash2, Edit2 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { ConfirmationModal } from '@/components/ConfirmationModal';
+import { TextInputModal } from '@/components/TextInputModal';
 
 export default function Dashboard() {
   const [notebooks, setNotebooks] = useState<Notebook[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // Modal states
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [renameModalState, setRenameModalState] = useState<{ isOpen: boolean; id: string; currentTitle: string }>({ isOpen: false, id: '', currentTitle: '' });
+  const [deleteModalState, setDeleteModalState] = useState<{ isOpen: boolean; id: string }>({ isOpen: false, id: '' });
 
   useEffect(() => {
     const loadNotebooks = async () => {
@@ -20,36 +27,31 @@ export default function Dashboard() {
     loadNotebooks();
   }, []);
 
-  const handleCreateNotebook = async () => {
-    const title = prompt("Enter notebook title:");
-    if (title) {
-      const newNotebook = await notebookService.createNotebook(title);
-      setNotebooks([newNotebook, ...notebooks]);
-      navigate(`/notebook/${newNotebook.id}`);
-    }
+  const handleCreateNotebook = async (title: string) => {
+    const newNotebook = await notebookService.createNotebook(title);
+    setNotebooks([newNotebook, ...notebooks]);
+    navigate(`/notebook/${newNotebook.id}`);
   };
 
-  const handleDeleteNotebook = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    if (confirm("Are you sure you want to delete this notebook?")) {
-      await notebookService.deleteNotebook(id);
-      setNotebooks(notebooks.filter(n => n.id !== id));
+  const handleDeleteNotebook = async () => {
+    if (deleteModalState.id) {
+      await notebookService.deleteNotebook(deleteModalState.id);
+      setNotebooks(notebooks.filter(n => n.id !== deleteModalState.id));
     }
-    setActiveMenuId(null);
+    setDeleteModalState({ isOpen: false, id: '' });
   };
 
-  const handleRenameNotebook = async (e: React.MouseEvent, id: string, currentTitle: string) => {
-    e.stopPropagation();
-    const newTitle = prompt("Enter new title:", currentTitle);
+  const handleRenameNotebook = async (newTitle: string) => {
+    const { id, currentTitle } = renameModalState;
     if (newTitle && newTitle !== currentTitle) {
       try {
         const updated = await notebookService.renameNotebook(id, newTitle);
         setNotebooks(notebooks.map(n => n.id === id ? updated : n));
       } catch (err) {
-        alert('Failed to rename notebook');
+        console.error('Failed to rename notebook', err);
       }
     }
-    setActiveMenuId(null);
+    setRenameModalState({ isOpen: false, id: '', currentTitle: '' });
   };
 
   return (
@@ -76,7 +78,7 @@ export default function Dashboard() {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={handleCreateNotebook}
+            onClick={() => setIsCreateModalOpen(true)}
             className="h-64 rounded-[32px] border border-dashed border-white/20 flex flex-col items-center justify-center gap-4 text-white/50 hover:border-indigo-500/50 hover:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all group bg-white/5 backdrop-blur-sm"
           >
             <div className="w-16 h-16 rounded-full bg-white/5 group-hover:bg-indigo-500/20 flex items-center justify-center transition-colors shadow-inner">
@@ -126,13 +128,21 @@ export default function Dashboard() {
                       {activeMenuId === notebook.id && (
                         <div className="absolute right-0 top-8 w-40 bg-[#0a0a0c] rounded-xl shadow-2xl border border-white/10 py-1 z-20">
                           <button
-                            onClick={(e) => handleRenameNotebook(e, notebook.id, notebook.title)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveMenuId(null);
+                              setRenameModalState({ isOpen: true, id: notebook.id, currentTitle: notebook.title });
+                            }}
                             className="w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white flex items-center gap-2 transition-colors"
                           >
                             <Edit2 className="w-4 h-4" /> Rename
                           </button>
                           <button
-                            onClick={(e) => handleDeleteNotebook(e, notebook.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveMenuId(null);
+                              setDeleteModalState({ isOpen: true, id: notebook.id });
+                            }}
                             className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" /> Delete
@@ -154,6 +164,34 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      <TextInputModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateNotebook}
+        title="Create New Notebook"
+        placeholder="Enter notebook title..."
+        submitLabel="Create Notebook"
+      />
+
+      <TextInputModal
+        isOpen={renameModalState.isOpen}
+        onClose={() => setRenameModalState({ isOpen: false, id: '', currentTitle: '' })}
+        onSubmit={handleRenameNotebook}
+        title="Rename Notebook"
+        initialValue={renameModalState.currentTitle}
+        submitLabel="Rename"
+      />
+
+      <ConfirmationModal
+        isOpen={deleteModalState.isOpen}
+        onClose={() => setDeleteModalState({ isOpen: false, id: '' })}
+        onConfirm={handleDeleteNotebook}
+        title="Delete Notebook"
+        message="Are you sure you want to delete this notebook? This action cannot be undone."
+        confirmLabel="Delete forever"
+        variant="danger"
+      />
     </div>
   );
 }
