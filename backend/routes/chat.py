@@ -56,7 +56,7 @@ def send_message(notebook_id):
             # API key not set or other Gemini error
             return jsonify({"error": error_msg}), 503
 
-        # Save model response
+        # Save model response (including agent tool call steps)
         model_msg = Message(
             id=str(uuid.uuid4()),
             notebook_id=notebook_id,
@@ -64,6 +64,7 @@ def send_message(notebook_id):
             content=result["content"],
         )
         model_msg.sources = result.get("sources", [])
+        model_msg.tool_calls = result.get("tool_calls", [])
         db.add(model_msg)
         db.commit()
         db.refresh(model_msg)

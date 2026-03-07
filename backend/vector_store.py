@@ -8,6 +8,7 @@ import time
 import chromadb
 from chromadb.config import Settings
 from chromadb.api.types import EmbeddingFunction, Documents, Embeddings
+from utils import retry_with_backoff
 
 
 # Support persistent storage on Render/Docker via DATA_DIR
@@ -38,24 +39,19 @@ class GeminiEmbeddingFunction(EmbeddingFunction):
         all_embeddings = []
         for i in range(0, len(input), EMBEDDING_BATCH_SIZE):
             batch = input[i : i + EMBEDDING_BATCH_SIZE]
-            max_retries = 5
-            for attempt in range(max_retries):
-                try:
-                    result = self._client.models.embed_content(
-                        model=EMBEDDING_MODEL,
-                        contents=batch,
-                    )
-                    all_embeddings.extend([emb.values for emb in result.embeddings])
-                    break  # Success, move to next batch
-                except Exception as exc:
-                    is_rate_limit = "429" in str(exc) or "RESOURCE_EXHAUSTED" in str(exc)
-                    if is_rate_limit and attempt < max_retries - 1:
-                        wait_time = (2 ** attempt) + 1  # 2s, 3s, 5s, 9s, 17s
-                        print(f"  ⚠ Embedding rate limit hit (attempt {attempt + 1}/{max_retries}). Waiting {wait_time}s...")
-                        time.sleep(wait_time)
-                    else:
-                        print(f"  ✖ Embedding failed: {exc}")
-                        raise
+            
+            def embed():
+                return self._client.models.embed_content(
+                    model=EMBEDDING_MODEL,
+                    contents=batch,
+                )
+            
+            try:
+                result = retry_with_backoff(embed)
+                all_embeddings.extend([emb.values for emb in result.embeddings])
+            except Exception as exc:
+                print(f"  ✖ Embedding failed after retries: {exc}")
+                raise
         return all_embeddings
 
 

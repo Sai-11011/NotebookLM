@@ -104,6 +104,7 @@ class Message(Base):
     content = Column(Text, nullable=False)
     timestamp = Column(DateTime, default=utcnow)
     source_ids_json = Column(Text, default="[]")  # JSON list of source IDs cited
+    tool_calls_json = Column(Text, default="[]")  # JSON list of agent tool call steps
 
     notebook = relationship("Notebook", back_populates="messages")
 
@@ -118,6 +119,17 @@ class Message(Base):
     def sources(self, value):
         self.source_ids_json = json.dumps(value or [])
 
+    @property
+    def tool_calls(self):
+        try:
+            return json.loads(self.tool_calls_json or "[]")
+        except (json.JSONDecodeError, TypeError):
+            return []
+
+    @tool_calls.setter
+    def tool_calls(self, value):
+        self.tool_calls_json = json.dumps(value or [])
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -125,6 +137,7 @@ class Message(Base):
             "content": self.content,
             "timestamp": self.timestamp.isoformat() if self.timestamp else None,
             "sources": self.sources,
+            "toolCalls": self.tool_calls,
         }
 
 
