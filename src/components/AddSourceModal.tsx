@@ -209,15 +209,7 @@ export function AddSourceModal({ isOpen, onClose, onAdd }: AddSourceModalProps) 
             <LinkIcon className="w-4 h-4 translate-y-[-1px]" />
             <Youtube className="w-4 h-4 text-red-500" />
           </div>
-          Websites
-        </button>
-        <button
-          onClick={() => alert('Google Drive integration coming soon!')}
-          className="flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/5 rounded-full hover:bg-white/10 text-white/80 hover:text-white transition-all font-medium text-sm cursor-pointer"
-          title="Google Drive integration coming soon"
-        >
-          <Triangle className="w-5 h-5 rotate-180" />
-          Drive
+          Web page / YouTube
         </button>
         <button
           onClick={() => setView('text')}
@@ -382,6 +374,11 @@ export function AddSourceModal({ isOpen, onClose, onAdd }: AddSourceModalProps) 
                     className="relative w-full bg-[#16161a] border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-blue-500/50 shadow-inner"
                   />
                 </div>
+                {error && (
+                  <p className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-left animate-in fade-in">
+                    {error}
+                  </p>
+                )}
                 <div className="flex justify-center gap-4">
                   <button onClick={() => setView('main')} className="px-6 py-2 rounded-full hover:bg-white/5 transition-colors">Cancel</button>
                   <button

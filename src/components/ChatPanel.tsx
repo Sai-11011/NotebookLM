@@ -1,12 +1,127 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNotebook } from '@/context/NotebookContext';
-import { Send, Sparkles, Bot, User, X, Trash2, AlertCircle } from 'lucide-react';
+import { Send, Sparkles, Bot, User, X, Trash2, AlertCircle, Search, Globe, FileText, PenLine, List, Zap } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { notebookService } from '@/services/mockApi';
 import { ConfirmationModal } from './ConfirmationModal';
 import { RateLimitPopup } from './RateLimitPopup';
+import type { ToolCall } from '@/types';
+
+// Map tool names to icons, labels, and colors for the agent step cards
+const TOOL_META: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
+  search_sources: {
+    icon: <Search className="w-4 h-4" />,
+    label: 'Searching sources',
+    color: 'from-blue-500/20 to-cyan-500/10 border-blue-500/30',
+  },
+  list_sources: {
+    icon: <List className="w-4 h-4" />,
+    label: 'Listing sources',
+    color: 'from-teal-500/20 to-emerald-500/10 border-teal-500/30',
+  },
+  create_note: {
+    icon: <PenLine className="w-4 h-4" />,
+    label: 'Creating note',
+    color: 'from-amber-500/20 to-yellow-500/10 border-amber-500/30',
+  },
+  fetch_url_as_source: {
+    icon: <Globe className="w-4 h-4" />,
+    label: 'Fetching URL',
+    color: 'from-purple-500/20 to-violet-500/10 border-purple-500/30',
+  },
+  search_web_for_info: {
+    icon: <Globe className="w-4 h-4" />,
+    label: 'Searching the web',
+    color: 'from-rose-500/20 to-pink-500/10 border-rose-500/30',
+  },
+};
+
+function AgentStepCard({ call, index }: { call: ToolCall; index: number }) {
+  const meta = TOOL_META[call.tool] || {
+    icon: <Zap className="w-4 h-4" />,
+    label: call.tool,
+    color: 'from-gray-500/20 to-gray-500/10 border-gray-500/30',
+  };
+
+  const argSummary = Object.entries(call.args)
+    .filter(([k]) => k !== 'notebook_id')
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(', ');
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20, scale: 0.95 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      transition={{ delay: index * 0.1, duration: 0.3, ease: 'easeOut' }}
+      className={cn(
+        'flex items-start gap-3 px-4 py-3 rounded-xl border backdrop-blur-sm bg-gradient-to-r',
+        meta.color
+      )}
+    >
+      <div className="mt-0.5 text-white/70 shrink-0">{meta.icon}</div>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-semibold text-white/80 uppercase tracking-wider">
+          {meta.label}
+        </p>
+        {argSummary && (
+          <p className="text-[11px] text-white/50 truncate mt-0.5">{argSummary}</p>
+        )}
+        {call.result_preview && (
+          <p className="text-[11px] text-white/40 truncate mt-1 italic">
+            → {call.result_preview.slice(0, 120)}
+          </p>
+        )}
+      </div>
+      <div className="shrink-0 mt-0.5">
+        <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+      </div>
+    </motion.div>
+  );
+}
+
+function TypingIndicator() {
+  const steps = [
+    'Analyzing your request...',
+    'Searching for information...',
+    'Processing results...',
+    'Generating response...',
+  ];
+  const [stepIndex, setStepIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStepIndex((prev) => (prev + 1) % steps.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex gap-4 max-w-3xl mx-auto"
+    >
+      <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center shrink-0">
+        <Bot className="w-5 h-5 text-indigo-400" />
+      </div>
+      <div className="bg-[#16161a]/90 backdrop-blur-xl border border-white/10 shadow-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] rounded-[24px] rounded-tl-sm p-5 flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+        </div>
+        <div className="flex items-center gap-2">
+          <Zap className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+          <p className="text-[13px] text-indigo-400/80 font-medium tracking-wide">
+            {steps[stepIndex]}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export function ChatPanel() {
   const { notebook, setNotebook, refreshNotebook, selectedSourceIds, toggleSourceSelection } = useNotebook();
@@ -113,7 +228,7 @@ export function ChatPanel() {
               </div>
               <p className="text-xl font-medium text-white/90 tracking-tight">Start the conversation</p>
               <p className="text-sm max-w-md text-center text-white/50 leading-relaxed">
-                Ask questions about your sources, request summaries, or brainstorm ideas based on the content.
+                Ask questions about your sources, request summaries, or share a URL for the agent to fetch and analyze.
               </p>
             </div>
 
@@ -124,10 +239,18 @@ export function ChatPanel() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   key={i}
-                  onClick={() => setInput(q)}
-                  className="p-4 text-left text-sm text-white/70 bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-xl hover:border-indigo-500/30 hover:bg-indigo-500/10 transition-all shadow-sm group"
+                  onClick={() => {
+                    setInput(q);
+                    // Use setTimeout to ensure state updates before clicking
+                    setTimeout(() => {
+                      const btn = document.getElementById('send-button');
+                      if (btn) btn.click();
+                    }, 0);
+                  }}
+                  className="p-4 text-left text-sm text-white/70 bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-xl hover:border-indigo-500/30 hover:bg-indigo-500/10 transition-all shadow-sm group relative overflow-hidden"
                 >
-                  <span className="group-hover:text-indigo-300 transition-colors">{q}</span>
+                  <span className="group-hover:text-indigo-300 transition-colors uppercase text-[10px] font-bold tracking-widest block mb-1 opacity-50">Suggestion</span>
+                  <span className="group-hover:text-white transition-colors block">{q}</span>
                 </motion.button>
               ))}
             </div>
@@ -151,12 +274,31 @@ export function ChatPanel() {
               </div>
 
               <div className={cn(
-                "rounded-[24px] p-5 max-w-[80%] shadow-lg",
+                "rounded-[24px] max-w-[80%] shadow-lg",
                 msg.role === 'user'
-                  ? "bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-tr-sm shadow-indigo-500/20"
+                  ? "bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-tr-sm shadow-indigo-500/20 p-5"
                   : "bg-[#16161a]/90 backdrop-blur-xl border border-white/10 text-white/90 rounded-tl-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"
               )}>
-                <div className="markdown-body text-[15px] leading-relaxed">
+                {/* Agent Tool Call Steps (only for model messages) */}
+                {msg.role === 'model' && msg.toolCalls && msg.toolCalls.length > 0 && (
+                  <div className="p-4 pb-2 space-y-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Zap className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest">
+                        Agent Actions ({msg.toolCalls.length})
+                      </span>
+                    </div>
+                    {msg.toolCalls.map((call, i) => (
+                      <AgentStepCard key={i} call={call} index={i} />
+                    ))}
+                  </div>
+                )}
+
+                {/* Message Content */}
+                <div className={cn(
+                  "markdown-body text-[15px] leading-relaxed",
+                  msg.role === 'model' ? "p-5 pt-3" : ""
+                )}>
                   <ReactMarkdown>{msg.content}</ReactMarkdown>
                 </div>
               </div>
@@ -164,27 +306,7 @@ export function ChatPanel() {
           ))
         )}
 
-        {isTyping && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex gap-4 max-w-3xl mx-auto"
-          >
-            <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center shrink-0">
-              <Bot className="w-5 h-5 text-indigo-400" />
-            </div>
-            <div className="bg-[#16161a]/90 backdrop-blur-xl border border-white/10 shadow-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] rounded-[24px] rounded-tl-sm p-5 flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-              </div>
-              <p className="text-[13px] text-indigo-400/80 font-medium animate-pulse tracking-wide">
-                Agent is researching...
-              </p>
-            </div>
-          </motion.div>
-        )}
+        {isTyping && <TypingIndicator />}
 
         {/* Error Banner */}
         <AnimatePresence>
@@ -234,13 +356,14 @@ export function ChatPanel() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder={selectedSources.length > 0 ? `Ask about ${selectedSources.length} selected sources...` : "Ask a question about your sources..."}
+              placeholder={selectedSources.length > 0 ? `Ask about ${selectedSources.length} selected sources...` : "Ask a question, or paste a URL for the agent to analyze..."}
               className="relative w-full pl-6 pr-14 py-4 bg-[#16161a] border border-white/10 rounded-[28px] focus:outline-none focus:border-indigo-500/50 transition-all shadow-inner text-white placeholder:text-white/30 text-[15px]"
               disabled={isTyping}
             />
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              id="send-button"
               onClick={handleSend}
               disabled={!input.trim() || isTyping}
               className="absolute right-2.5 p-2.5 bg-indigo-500 text-white rounded-full hover:bg-indigo-400 disabled:opacity-30 transition-all cursor-pointer shadow-lg shadow-indigo-500/30"

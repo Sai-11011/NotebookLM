@@ -7,6 +7,12 @@ export interface Source {
   dateAdded: string;
 }
 
+export interface ToolCall {
+  tool: string;
+  args: Record<string, string>;
+  result_preview: string;
+}
+
 export interface Message {
   id: string;
   role: 'user' | 'model';
@@ -14,6 +20,7 @@ export interface Message {
   timestamp: string;
   sources?: string[]; // IDs of sources referenced
   citations?: string[]; // specific citation indices or IDs
+  toolCalls?: ToolCall[]; // Agent tool call steps
 }
 
 export interface Note {
