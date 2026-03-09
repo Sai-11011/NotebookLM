@@ -1,45 +1,42 @@
 # NotebookLM
 
 ## 🚀 Latest Updates
-### Changelog
-
-* **Feature**:
-  * Added a new script `diagnose_api.py` to test the Gemini API and list available models.
-  * Modified `ai_service.py` to default to the "gemini-1.5-flash" model for content generation.
-  * Introduced a 1-second delay between iterations in `ai_service.py` to avoid bursting the 5 RPM limit.
-* **Bug Fix**:
-  * Improved rate limit detection in `utils.py` to handle different error messages.
-  * Enhanced retry logic in `utils.py` to respect the 5 RPM limit and add a base delay.
-  * Updated error handling in `ai_service.py` to log and re-raise exceptions.
-* **Chore**:
-  * Removed the `.env.example` file, as API keys are now injected at runtime.
-  * Refactored `utils.py` to use a more robust method for checking rate limit errors.
+* **Chore**: Removed unnecessary comments and whitespace from the README.md file, including a test automation comment and an empty line at the end of the file, to improve overall readability and maintainability.
 
 ---
 
-## Connecting to Backend
-
-The application currently uses a mock API service located in `src/services/mockApi.ts`. 
-
-To connect to your Flask backend:
-
-1. Open `src/services/mockApi.ts`.
-2. Replace the mock functions with `fetch` calls to your API endpoints.
-3. Ensure your Flask backend supports CORS.
-
-## Project Structure
-
-- `src/components`: Reusable UI components (ChatPanel, SourcePanel, etc.).
-- `src/pages`: Main page views (Dashboard, NotebookPage).
-- `src/services`: API layer (currently mock).
-- `src/context`: State management (NotebookContext).
-- `src/types`: TypeScript definitions.
-
-## Development
-
-This project uses Vite + React + Tailwind CSS.
-
-- `npm run dev`: Start development server.
-- `npm run build`: Build for production.
-"# NotebookLM" 
-
+IyBOb3RlYm9va0xNCgojIyDwn5qAIExhdGVzdCBVcGRhdGVzCiMjIyBDaGFu
+Z2Vsb2cKCiogKipGZWF0dXJlKio6CiAgKiBBZGRlZCBhIG5ldyBzY3JpcHQg
+YGRpYWdub3NlX2FwaS5weWAgdG8gdGVzdCB0aGUgR2VtaW5pIEFQSSBhbmQg
+bGlzdCBhdmFpbGFibGUgbW9kZWxzLgogICogTW9kaWZpZWQgYGFpX3NlcnZp
+Y2UucHlgIHRvIGRlZmF1bHQgdG8gdGhlICJnZW1pbmktMS41LWZsYXNoIiBt
+b2RlbCBmb3IgY29udGVudCBnZW5lcmF0aW9uLgogICogSW50cm9kdWNlZCBh
+IDEtc2Vjb25kIGRlbGF5IGJldHdlZW4gaXRlcmF0aW9ucyBpbiBgYWlfc2Vy
+dmljZS5weWAgdG8gYXZvaWQgYnVyc3RpbmcgdGhlIDUgUlBNIGxpbWl0Lgoq
+ICoqQnVnIEZpeCoqOgogICogSW1wcm92ZWQgcmF0ZSBsaW1pdCBkZXRlY3Rp
+b24gaW4gYHV0aWxzLnB5YCB0byBoYW5kbGUgZGlmZmVyZW50IGVycm9yIG1l
+c3NhZ2VzLgogICogRW5oYW5jZWQgcmV0cnkgbG9naWMgaW4gYHV0aWxzLnB5
+YCB0byByZXNwZWN0IHRoZSA1IFJQTSBsaW1pdCBhbmQgYWRkIGEgYmFzZSBk
+ZWxheS4KICAqIFVwZGF0ZWQgZXJyb3IgaGFuZGxpbmcgaW4gYGFpX3NlcnZp
+Y2UucHlgIHRvIGxvZyBhbmQgcmUtcmFpc2UgZXhjZXB0aW9ucy4KKiAqKkNo
+b3JlKio6CiAgKiBSZW1vdmVkIHRoZSBgLmVudi5leGFtcGxlYCBmaWxlLCBh
+cyBBUEkga2V5cyBhcmUgbm93IGluamVjdGVkIGF0IHJ1bnRpbWUuCiAgKiBS
+ZWZhY3RvcmVkIGB1dGlscy5weWAgdG8gdXNlIGEgbW9yZSByb2J1c3QgbWV0
+aG9kIGZvciBjaGVja2luZyByYXRlIGxpbWl0IGVycm9ycy4KCi0tLQoKIyMg
+Q29ubmVjdGluZyB0byBCYWNrZW5kCgpUaGUgYXBwbGljYXRpb24gY3VycmVu
+dGx5IHVzZXMgYSBtb2NrIEFQSSBzZXJ2aWNlIGxvY2F0ZWQgaW4gYHNyYy9z
+ZXJ2aWNlcy9tb2NrQXBpLnRzYC4gCgpUbyBjb25uZWN0IHRvIHlvdXIgRmxh
+c2sgYmFja2VuZDoKCjEuIE9wZW4gYHNyYy9zZXJ2aWNlcy9tb2NrQXBpLnRz
+YC4KMi4gUmVwbGFjZSB0aGUgbW9jayBmdW5jdGlvbnMgd2l0aCBgZmV0Y2hg
+IGNhbGxzIHRvIHlvdXIgQVBJIGVuZHBvaW50cy4KMy4gRW5zdXJlIHlvdXIg
+Rmxhc2sgYmFja2VuZCBzdXBwb3J0cyBDT1JTLgoKIyMgUHJvamVjdCBTdHJ1
+Y3R1cmUKCi0gYHNyYy9jb21wb25lbnRzYDogUmV1c2FibGUgVUkgY29tcG9u
+ZW50cyAoQ2hhdFBhbmVsLCBTb3VyY2VQYW5lbCwgZXRjLikuCi0gYHNyYy9w
+YWdlc2A6IE1haW4gcGFnZSB2aWV3cyAoRGFzaGJvYXJkLCBOb3RlYm9va1Bh
+Z2UpLgotIGBzcmMvc2VydmljZXNgOiBBUEkgbGF5ZXIgKGN1cnJlbnRseSBt
+b2NrKS4KLSBgc3JjL2NvbnRleHRgOiBTdGF0ZSBtYW5hZ2VtZW50IChOb3Rl
+Ym9va0NvbnRleHQpLgotIGBzcmMvdHlwZXNgOiBUeXBlU2NyaXB0IGRlZmlu
+aXRpb25zLgoKIyMgRGV2ZWxvcG1lbnQKClRoaXMgcHJvamVjdCB1c2VzIFZp
+dGUgKyBSZWFjdCArIFRhaWx3aW5kIENTUy4KCi0gYG5wbSBydW4gZGV2YDog
+U3RhcnQgZGV2ZWxvcG1lbnQgc2VydmVyLgotIGBucG0gcnVuIGJ1aWxkYDog
+QnVpbGQgZm9yIHByb2R1Y3Rpb24uCiIjIE5vdGVib29rTE0iIAoK
