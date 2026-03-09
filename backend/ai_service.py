@@ -89,9 +89,17 @@ def chat_with_sources(notebook_id: str, user_message: str, chat_history: list[di
 
     try:
         for iteration in range(MAX_ITERATIONS):
+            # Slow down slightly between iterations to avoid bursting the 5 RPM limit
+            if iteration > 0:
+                print(f"  ... pausing 1s before iteration {iteration+1} ...")
+                import time
+                time.sleep(1)
+
             def generate():
+                # Try 2.0 Flash first, but fallback to 1.5 Flash if needed?
+                # Actually, let's stick to 1.5-flash for now as it's more stable for many users
                 return client.models.generate_content(
-                    model="gemini-2.0-flash",
+                    model="gemini-1.5-flash", 
                     contents=contents,
                     config=types.GenerateContentConfig(
                         system_instruction=system_instruction,
@@ -100,7 +108,13 @@ def chat_with_sources(notebook_id: str, user_message: str, chat_history: list[di
                     )
                 )
             
-            response = retry_with_backoff(generate)
+            try:
+                response = retry_with_backoff(generate)
+            except Exception as e:
+                # Log exactly what happened if retries failed
+                print(f"\n  ✖ API CALL FAILED after all retries in iteration {iteration+1}")
+                print(f"  Error: {str(e)}")
+                raise
 
             # Check if the model wants to call a function
             candidate = response.candidates[0] if response.candidates else None
