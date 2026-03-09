@@ -1,17 +1,17 @@
 # NotebookLM
 
 ## 🚀 Latest Updates
-Here is the changelog in a bulleted format, categorized by Feature, Bug Fix, and Chore:
+Here is a short, bulleted changelog for the code changes:
 
-* **Feature**:
-  * Added a new script `diagnose_api.py` to test the Gemini API and list available models.
-  * Modified `ai_service.py` to default to the "gemini-1.5-flash" model for content generation.
+* **Feature:**
+  * Added a new script `diagnose_api.py` to test the Gemie API and list available models.
+  * Modified `ai_service.py` to default to the "gemie-1.5-flash" model for content generation.
   * Introduced a 1-second delay between iterations in `ai_service.py` to avoid bursting the 5 RPM limit.
-* **Bug Fix**:
+* **Bug Fix:**
   * Improved rate limit detection in `utils.py` to handle different error messages.
   * Enhanced retry logic in `utils.py` to respect the 5 RPM limit and added a base delay.
   * Updated error handling in `ai_service.py` to log and re-raise exceptions.
-* **Chore**:
+* **Chore:**
   * Removed unnecessary comments and whitespace from the `README.md` file.
   * Removed the `.env.example` file, as API keys are now injected at runtime.
   * Refactored `utils.py` to use a more robust method for checking rate limit errors.
@@ -40,10 +40,42 @@ ZXhhbXBsZWAgZmlsZSwgYXMgQVBJIGtleXMgYXJlIG5vdyBpbmplY3RlZCBh
 dCBydW50aW1lLgogICogUmVmYWN0b3JlZCBgdXRpbHMucHlgIHRvIHVzZSBh
 IG1vcmUgcm9idXN0IG1ldGhvZCBmb3IgY2hlY2tpbmcgcmF0ZSBsaW1pdCBl
 cnJvcnMuCgotLS0KCkl5Qk9iM1JsWW05dmEweE5DZ29qSXlEd241cUFJRXho
-ZEdWemRDQlZjR1JoZEdWekNpb2dLaXBEYUc5eQpaU29xT2lCU1pXMXZkbVZr
-SUhWdWJtVmpaWE56WVhKNUlHTnZiVzFsYm5SeklHRnVaQ0IzYUdsMFpYTncK
-WVdObElHWnliMjBnZEdobElGSkZRVVJOUlM1dFpDQm1hV3hsTENCcGJtTnNk
-V1JwYm1jZ1lTQjBaWE4wCklHRjFkRzl0WVhScGIyNGdZMjl0YldWdWRDQmhi
-bVFnWVc0Z1pXMXdkSGtnYkdsdVpTQmhkQ0IwYUdVZwpaVzVrSUc5bUlIUm9a
-U0JtYVd4bExDQjBieUJwYlhCeWIzWmxJRzkyWlhKaGJHd2djbVZoWkdGaWFX
-eHAKZEhrZ1lXNWtJRzFoYVc1MFlXbHVZV0pwYkdsMGVTNEtDaTB0TFFvPQo=
+ZEdWemRDQlZjR1JoZEdWekNraGxjbVVnYVhNZwpkR2hsSUdOb1lXNW5aV3h2
+WnlCcGJpQmhJR0oxYkd4bGRHVmtJR1p2Y20xaGRDd2dZMkYwWldkdmNtbDYK
+WldRZ1lua2dSbVZoZEhWeVpTd2dRblZuSUVacGVDd2dZVzVrSUVOb2IzSmxP
+Z29LS2lBcUtrWmxZWFIxCmNtVXFLam9LSUNBcUlFRmtaR1ZrSUdFZ2JtVjNJ
+SE5qY21sd2RDQmdaR2xoWjI1dmMyVmZZWEJwTG5CNQpZQ0IwYnlCMFpYTjBJ
+SFJvWlNCSFpXMXBibWtnUVZCSklHRnVaQ0JzYVhOMElHRjJZV2xzWVdKc1pT
+QnQKYjJSbGJITXVDaUFnS2lCTmIyUnBabWxsWkNCZ1lXbGZjMlZ5ZG1salpT
+NXdlV0FnZEc4Z1pHVm1ZWFZzCmRDQjBieUIwYUdVZ0ltZGxiV2x1YVMweExq
+VXRabXhoYzJnaUlHMXZaR1ZzSUdadmNpQmpiMjUwWlc1MApJR2RsYm1WeVlY
+UnBiMjR1Q2lBZ0tpQkpiblJ5YjJSMVkyVmtJR0VnTVMxelpXTnZibVFnWkdW
+c1lYa2cKWW1WMGQyVmxiaUJwZEdWeVlYUnBiMjV6SUdsdUlHQmhhVjl6WlhK
+MmFXTmxMbkI1WUNCMGJ5QmhkbTlwClpDQmlkWEp6ZEdsdVp5QjBhR1VnTlNC
+U1VFMGdiR2x0YVhRdUNpb2dLaXBDZFdjZ1JtbDRLaW82Q2lBZwpLaUJKYlhC
+eWIzWmxaQ0J5WVhSbElHeHBiV2wwSUdSbGRHVmpkR2x2YmlCcGJpQmdkWFJw
+YkhNdWNIbGcKSUhSdklHaGhibVJzWlNCa2FXWm1aWEpsYm5RZ1pYSnliM0ln
+YldWemMyRm5aWE11Q2lBZ0tpQkZibWhoCmJtTmxaQ0J5WlhSeWVTQnNiMmRw
+WXlCcGJpQmdkWFJwYkhNdWNIbGdJSFJ2SUhKbGMzQmxZM1FnZEdobApJRFVn
+VWxCTklHeHBiV2wwSUdGdVpDQmhaR1JsWkNCaElHSmhjMlVnWkdWc1lYa3VD
+aUFnS2lCVmNHUmgKZEdWa0lHVnljbTl5SUdoaGJtUnNhVzVuSUdsdUlHQmhh
+Vjl6WlhKMmFXTmxMbkI1WUNCMGJ5QnNiMmNnCllXNWtJSEpsTFhKaGFYTmxJ
+R1Y0WTJWd2RHbHZibk11Q2lvZ0tpcERhRzl5WlNvcU9nb2dJQ29nVW1WdApi
+M1psWkNCMWJtNWxZMlZ6YzJGeWVTQmpiMjF0Wlc1MGN5QmhibVFnZDJocGRH
+VnpjR0ZqWlNCbWNtOXQKSUhSb1pTQmdVa1ZCUkUxRkxtMWtZQ0JtYVd4bExn
+b2dJQ29nVW1WdGIzWmxaQ0IwYUdVZ1lDNWxibll1ClpYaGhiWEJzWldBZ1pt
+bHNaU3dnWVhNZ1FWQkpJR3RsZVhNZ1lYSmxJRzV2ZHlCcGJtcGxZM1JsWkNC
+aApkQ0J5ZFc1MGFXMWxMZ29nSUNvZ1VtVm1ZV04wYjNKbFpDQmdkWFJwYkhN
+dWNIbGdJSFJ2SUhWelpTQmgKSUcxdmNtVWdjbTlpZFhOMElHMWxkR2h2WkNC
+bWIzSWdZMmhsWTJ0cGJtY2djbUYwWlNCc2FXMXBkQ0JsCmNuSnZjbk11Q2dv
+dExTMEtDa2w1UWs5aU0xSnNXVzA1ZG1Fd2VFNURaMjlxU1hsRWQyNDFjVUZK
+UlhobwpaRWRXZW1SRFFsWmpSMUpvWkVkV2VrTnBiMmRMYVhCRVlVYzVlUXBh
+VTI5eFQybENVMXBYTVhaa2JWWnIKU1VoV2RXSnRWbXBhV0U1NldWaEtOVWxI
+VG5aaVZ6RnNZbTVTZWtsSFJuVmFRMEl6WVVkc01GcFlUbmNLCldWZE9iRWxI
+V25saU1qQm5aRWRvYkVsR1NrWlJWVkpPVWxNMWRGcERRbTFoVjNoc1RFTkNj
+R0p0VG5OawpWMUp3WW0xaloxbFRRakJhV0U0d0NrbEhSakZrUnpsMFdWaFNj
+R0l5TkdkWk1qbDBZbGRXZFdSRFFtaGkKYlZGbldWYzBaMXBYTVhka1NHdG5Z
+a2RzZFZwVFFtaGtRMEl3WVVkVlp3cGFWelZyU1VjNWJVbElVbTlhClUwSnRZ
+VmQ0YkV4RFFqQmllVUp3WWxoQ2VXSXpXbXhKUnpreVdsaEthR0pIZDJkamJW
+Wm9Xa2RHYVdGWAplSEFLWkVocloxbFhOV3RKUnpGb1lWYzFNRmxYYkhWWlYw
+cHdZa2RzTUdWVE5FdERhVEIwVEZGdlBRbz0K
