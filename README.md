@@ -35,3 +35,6 @@ This project uses Vite + React + Tailwind CSS.
 - `npm run dev`: Start development server.
 - `npm run build`: Build for production.
 "# NotebookLM" 
+
+
+# This is testing for the automation
