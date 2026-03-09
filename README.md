@@ -1,27 +1,38 @@
 # NotebookLM
 
 ## 🚀 Latest Updates
-<<<<<<< HEAD
-Here's a short, bulleted changelog for the code changes, categorized by Feature, Bug Fix, and Chore:
-
-* **Feature:**
-  * Added a new script `diagnose_api.py` to test the Gemie API and list available models.
-  * Modified `ai_service.py` to default to the "gemie-1.5-flash" model for content generation.
-  * Introduced a 1-second delay between iterations in `ai_service.py` to avoid bursting the 5 RPM limit.
-* **Bug Fix:**
-  * Improved rate limit detection in `utils.py` to handle different error messages.
-  * Enhanced retry logic in `utils.py` to respect the 5 RPM limit and added a base delay.
-  * Updated error handling in `ai_service.py` to log and re-raise exceptions.
-* **Chore:**
-  * Removed unnecessary comments and whitespace from the `README.md` file.
-  * Removed the `.env.example` file, as API keys are now injected at runtime.
-=======
-* **Chore**:
-  * Removed unnecessary comments and whitespace from `README.md`, improving overall readability and consistency.
-  * Added a newline at the end of `README.md` to conform to standard file formatting conventions.
->>>>>>> 4f5bf334d35eddfcbccde761e05e9f589e17a8a5
-  * Refactored `utils.py` to use a more robust method for checking rate limit errors.
-  * Removed the `.env.example` file, as API keys are now injected at runtime.
+* **Feature**: Added a heading element (`<h1>`) to the index.html file to display a greeting message ("hello") 
+* **Chore**: Updated index.html file structure to include the new heading element
 
 ---
-## vamsi
+
+IyBOb3RlYm9va0xNCgojIyDwn5qAIExhdGVzdCBVcGRhdGVzCjw8PDw8PDwg
+SEVBRApIZXJlJ3MgYSBzaG9ydCwgYnVsbGV0ZWQgY2hhbmdlbG9nIGZvciB0
+aGUgY29kZSBjaGFuZ2VzLCBjYXRlZ29yaXplZCBieSBGZWF0dXJlLCBCdWcg
+Rml4LCBhbmQgQ2hvcmU6CgoqICoqRmVhdHVyZToqKgogICogQWRkZWQgYSBu
+ZXcgc2NyaXB0IGBkaWFnbm9zZV9hcGkucHlgIHRvIHRlc3QgdGhlIEdlbWll
+IEFQSSBhbmQgbGlzdCBhdmFpbGFibGUgbW9kZWxzLgogICogTW9kaWZpZWQg
+YGFpX3NlcnZpY2UucHlgIHRvIGRlZmF1bHQgdG8gdGhlICJnZW1pZS0xLjUt
+Zmxhc2giIG1vZGVsIGZvciBjb250ZW50IGdlbmVyYXRpb24uCiAgKiBJbnRy
+b2R1Y2VkIGEgMS1zZWNvbmQgZGVsYXkgYmV0d2VlbiBpdGVyYXRpb25zIGlu
+IGBhaV9zZXJ2aWNlLnB5YCB0byBhdm9pZCBidXJzdGluZyB0aGUgNSBSUE0g
+bGltaXQuCiogKipCdWcgRml4OioqCiAgKiBJbXByb3ZlZCByYXRlIGxpbWl0
+IGRldGVjdGlvbiBpbiBgdXRpbHMucHlgIHRvIGhhbmRsZSBkaWZmZXJlbnQg
+ZXJyb3IgbWVzc2FnZXMuCiAgKiBFbmhhbmNlZCByZXRyeSBsb2dpYyBpbiBg
+dXRpbHMucHlgIHRvIHJlc3BlY3QgdGhlIDUgUlBNIGxpbWl0IGFuZCBhZGRl
+ZCBhIGJhc2UgZGVsYXkuCiAgKiBVcGRhdGVkIGVycm9yIGhhbmRsaW5nIGlu
+IGBhaV9zZXJ2aWNlLnB5YCB0byBsb2cgYW5kIHJlLXJhaXNlIGV4Y2VwdGlv
+bnMuCiogKipDaG9yZToqKgogICogUmVtb3ZlZCB1bm5lY2Vzc2FyeSBjb21t
+ZW50cyBhbmQgd2hpdGVzcGFjZSBmcm9tIHRoZSBgUkVBRE1FLm1kYCBmaWxl
+LgogICogUmVtb3ZlZCB0aGUgYC5lbnYuZXhhbXBsZWAgZmlsZSwgYXMgQVBJ
+IGtleXMgYXJlIG5vdyBpbmplY3RlZCBhdCBydW50aW1lLgo9PT09PT09Ciog
+KipDaG9yZSoqOgogICogUmVtb3ZlZCB1bm5lY2Vzc2FyeSBjb21tZW50cyBh
+bmQgd2hpdGVzcGFjZSBmcm9tIGBSRUFETUUubWRgLCBpbXByb3Zpbmcgb3Zl
+cmFsbCByZWFkYWJpbGl0eSBhbmQgY29uc2lzdGVuY3kuCiAgKiBBZGRlZCBh
+IG5ld2xpbmUgYXQgdGhlIGVuZCBvZiBgUkVBRE1FLm1kYCB0byBjb25mb3Jt
+IHRvIHN0YW5kYXJkIGZpbGUgZm9ybWF0dGluZyBjb252ZW50aW9ucy4KPj4+
+Pj4+PiA0ZjViZjMzNGQzNWVkZGZjYmNjZGU3NjFlMDVlOWY1ODllMTdhOGE1
+CiAgKiBSZWZhY3RvcmVkIGB1dGlscy5weWAgdG8gdXNlIGEgbW9yZSByb2J1
+c3QgbWV0aG9kIGZvciBjaGVja2luZyByYXRlIGxpbWl0IGVycm9ycy4KICAq
+IFJlbW92ZWQgdGhlIGAuZW52LmV4YW1wbGVgIGZpbGUsIGFzIEFQSSBrZXlz
+IGFyZSBub3cgaW5qZWN0ZWQgYXQgcnVudGltZS4KCi0tLQojIyB2YW1zaQ==
