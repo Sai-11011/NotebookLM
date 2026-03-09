@@ -1,28 +1,42 @@
 # NotebookLM
 
 ## 🚀 Latest Updates
-Here's a short, bulleted changelog for the code changes, categorized by Feature, Bug Fix, or Chore:
-
-* **Feature**: 
+Here is a short, bulleted changelog for the code changes:
+* **Feature**:
   + Added a heading element to the index.html file to display a greeting message.
-* **Bug Fix**: 
+* **Bug Fix**:
   + None
-* **Chore**: 
+* **Chore**:
+  + Updated README.md file structure for better readability and consistency.
   + Removed unnecessary comments and whitespace from README.md.
   + Added a new line at the end of README.md to conform to standard file formatting conventions.
-  + Updated README.md file structure for better readability and consistency.
 
 ---
 
 IyBOb3RlYm9va0xNCgojIyDwn5qAIExhdGVzdCBVcGRhdGVzCkhlcmUncyBh
 IHNob3J0LCBidWxsZXRlZCBjaGFuZ2Vsb2cgZm9yIHRoZSBjb2RlIGNoYW5n
 ZXMsIGNhdGVnb3JpemVkIGJ5IEZlYXR1cmUsIEJ1ZyBGaXgsIG9yIENob3Jl
-OgoKKiAqKkZlYXR1cmUqKjoKICArIEFkZGVkIGEgaGVhZGluZyBlbGVtZW50
-IHRvIHRoZSBpbmRleC5odG1sIGZpbGUgdG8gZGlzcGxheSBhIGdyZWV0aW5n
-IG1lc3NhZ2UuCiogKipCdWcgRml4Kio6CiAgKyBOb25lCiogKipDaG9yZSoq
-OgogICsgVXBkYXRlZCBSRUFETUUubWQgZmlsZSBzdHJ1Y3R1cmUgZm9yIGJl
-dHRlciByZWFkYWJpbGl0eSBhbmQgY29uc2lzdGVuY3kuCiAgKyBSZW1vdmVk
-IHVubmVjZXNzYXJ5IGNvbW1lbnRzIGFuZCB3aGl0ZXNwYWNlIGZyb20gUkVB
-RE1FLm1kLgogICsgQWRkZWQgYSBuZXcgbGluZSBhdCB0aGUgZW5kIG9mIFJF
-QURNRS5tZCB0byBjb25mb3JtIHRvIHN0YW5kYXJkIGZpbGUgZm9ybWF0dGlu
-ZyBjb252ZW50aW9ucy4KCg==
+OgoKKiAqKkZlYXR1cmUqKjogCiAgKyBBZGRlZCBhIGhlYWRpbmcgZWxlbWVu
+dCB0byB0aGUgaW5kZXguaHRtbCBmaWxlIHRvIGRpc3BsYXkgYSBncmVldGlu
+ZyBtZXNzYWdlLgoqICoqQnVnIEZpeCoqOiAKICArIE5vbmUKKiAqKkNob3Jl
+Kio6IAogICsgUmVtb3ZlZCB1bm5lY2Vzc2FyeSBjb21tZW50cyBhbmQgd2hp
+dGVzcGFjZSBmcm9tIFJFQURNRS5tZC4KICArIEFkZGVkIGEgbmV3IGxpbmUg
+YXQgdGhlIGVuZCBvZiBSRUFETUUubWQgdG8gY29uZm9ybSB0byBzdGFuZGFy
+ZCBmaWxlIGZvcm1hdHRpbmcgY29udmVudGlvbnMuCiAgKyBVcGRhdGVkIFJF
+QURNRS5tZCBmaWxlIHN0cnVjdHVyZSBmb3IgYmV0dGVyIHJlYWRhYmlsaXR5
+IGFuZCBjb25zaXN0ZW5jeS4KCi0tLQoKSXlCT2IzUmxZbTl2YTB4TkNnb2pJ
+eUR3bjVxQUlFeGhkR1Z6ZENCVmNHUmhkR1Z6Q2tobGNtVW5jeUJoCklITm9i
+M0owTENCaWRXeHNaWFJsWkNCamFHRnVaMlZzYjJjZ1ptOXlJSFJvWlNCamIy
+UmxJR05vWVc1bgpaWE1zSUdOaGRHVm5iM0pwZW1Wa0lHSjVJRVpsWVhSMWNt
+VXNJRUoxWnlCR2FYZ3NJRzl5SUVOb2IzSmwKT2dvS0tpQXFLa1psWVhSMWNt
+VXFLam9LSUNBcklFRmtaR1ZrSUdFZ2FHVmhaR2x1WnlCbGJHVnRaVzUwCklI
+UnZJSFJvWlNCcGJtUmxlQzVvZEcxc0lHWnBiR1VnZEc4Z1pHbHpjR3hoZVNC
+aElHZHlaV1YwYVc1bgpJRzFsYzNOaFoyVXVDaW9nS2lwQ2RXY2dSbWw0S2lv
+NkNpQWdLeUJPYjI1bENpb2dLaXBEYUc5eVpTb3EKT2dvZ0lDc2dWWEJrWVhS
+bFpDQlNSVUZFVFVVdWJXUWdabWxzWlNCemRISjFZM1IxY21VZ1ptOXlJR0ps
+CmRIUmxjaUJ5WldGa1lXSnBiR2wwZVNCaGJtUWdZMjl1YzJsemRHVnVZM2t1
+Q2lBZ0t5QlNaVzF2ZG1WawpJSFZ1Ym1WalpYTnpZWEo1SUdOdmJXMWxiblJ6
+SUdGdVpDQjNhR2wwWlhOd1lXTmxJR1p5YjIwZ1VrVkIKUkUxRkxtMWtMZ29n
+SUNzZ1FXUmtaV1FnWVNCdVpYY2diR2x1WlNCaGRDQjBhR1VnWlc1a0lHOW1J
+RkpGClFVUk5SUzV0WkNCMGJ5QmpiMjVtYjNKdElIUnZJSE4wWVc1a1lYSmtJ
+R1pwYkdVZ1ptOXliV0YwZEdsdQpaeUJqYjI1MlpXNTBhVzl1Y3k0S0NnPT0K
